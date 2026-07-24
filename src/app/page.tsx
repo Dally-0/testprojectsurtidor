@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import {
   Fuel,
@@ -16,6 +17,7 @@ import {
   Phone,
   Mail,
   Timer,
+  LayoutDashboard,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -26,58 +28,94 @@ export default function LandingPage() {
       {/* ===== HERO SECTION ===== */}
       <section
         id="inicio"
-        className="relative min-h-screen flex items-center justify-start overflow-hidden"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden py-24"
       >
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
+        {/* Background Ambient Glows */}
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Decorative background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent rounded-full blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-accent rounded-full blur-[100px]" />
-        </div>
+        {/* Content Container */}
+        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 w-full pt-12">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            {/* Left Column — Text */}
+            <div className="lg:col-span-7">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-full px-4 py-1.5 mb-8 animate-fade-in-up">
+                <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+                <span className="text-xs tracking-figma-wide text-accent font-medium">
+                  SISTEMA DE GESTIÓN EN TIEMPO REAL
+                </span>
+              </div>
 
-        {/* Content */}
-        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-20">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-full px-4 py-1.5 mb-8 animate-fade-in-up">
-            <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-            <span className="text-xs tracking-figma-wide text-accent font-medium">
-              SISTEMA DE GESTIÓN ACTIVO
-            </span>
-          </div>
+              {/* Main Heading */}
+              <h1 className="heading-figma text-4xl sm:text-6xl md:text-7xl lg:text-7xl mb-6 leading-none animate-fade-in-up stagger-1 opacity-0">
+                COMBUSTIBLE<br />
+                <span className="text-accent">QUE MUEVE</span><br />
+                AL PAÍS
+              </h1>
 
-          {/* Main Heading */}
-          <h1 className="heading-figma text-5xl sm:text-6xl md:text-7xl lg:text-8xl max-w-4xl mb-8 animate-fade-in-up stagger-1 opacity-0">
-            COMBUSTIBLE<br />
-            <span className="text-accent">QUE MUEVE</span><br />
-            AL PAÍS
-          </h1>
+              {/* Subtitle */}
+              <p className="text-text-secondary text-base sm:text-lg md:text-xl max-w-2xl mb-10 leading-relaxed animate-fade-in-up stagger-2 opacity-0">
+                Servicio de abastecimiento confiable, telemetría automatizada y
+                gestión operativa inteligente para estaciones de servicio y flotas.
+              </p>
 
-          {/* Subtitle */}
-          <p className="text-text-secondary text-lg md:text-xl max-w-2xl mb-10 leading-relaxed animate-fade-in-up stagger-2 opacity-0">
-            Servicio de abastecimiento confiable, tecnología de punta y
-            atención personalizada para flotas, empresas y particulares.
-          </p>
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap gap-4 animate-fade-in-up stagger-3 opacity-0">
+                <Link
+                  href="/dashboard"
+                  id="hero-cta-dashboard"
+                  className="group inline-flex items-center gap-2.5 bg-accent hover:bg-accent-hover text-background font-bold tracking-figma px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  ACCEDER AL DASHBOARD
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <a
+                  href="#servicios"
+                  id="hero-cta-services"
+                  className="inline-flex items-center gap-2 border border-border hover:border-text-secondary text-text-primary font-semibold tracking-figma px-8 py-3.5 rounded-xl transition-all hover:bg-surface"
+                >
+                  VER SERVICIOS
+                </a>
+              </div>
+            </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap gap-4 animate-fade-in-up stagger-3 opacity-0">
-            <a
-              href="#servicios"
-              id="hero-cta-services"
-              className="group inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-background font-semibold tracking-figma px-8 py-3.5 rounded transition-all hover:shadow-lg hover:shadow-accent/20"
-            >
-              VER SERVICIOS
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="#contacto"
-              id="hero-cta-contact"
-              className="inline-flex items-center gap-2 border border-border hover:border-text-secondary text-text-primary font-semibold tracking-figma px-8 py-3.5 rounded transition-all hover:bg-surface"
-            >
-              CONTACTAR
-            </a>
+            {/* Right Column — Hero Visual Showcase */}
+            <div className="lg:col-span-5 relative animate-fade-in-up stagger-4 opacity-0">
+              <div className="relative mx-auto max-w-lg lg:max-w-none">
+                {/* Glow Ring Behind Image */}
+                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-accent/50 via-accent/20 to-transparent blur-xl opacity-70 animate-pulse-glow" />
+
+                {/* Glassmorphic Frame Card */}
+                <div className="relative rounded-2xl bg-surface/90 border border-accent/30 overflow-hidden shadow-2xl shadow-black/90">
+                  <div className="relative aspect-[4/3] w-full">
+                    <Image
+                      src="/fuel_station_hero.png"
+                      alt="Dally SRL Surtidor de Combustible Digital"
+                      fill
+                      priority
+                      className="object-cover object-center transition-transform duration-700 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-90" />
+                  </div>
+
+                  {/* Live Status Overlay Badge */}
+                  <div className="absolute bottom-4 left-4 right-4 p-4 glass rounded-xl border border-white/10 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
+                      <div>
+                        <p className="text-xs font-bold text-text-primary tracking-figma">SURTIDORES DALLY SRL</p>
+                        <p className="text-[10px] text-text-muted">Telemetría de Bomba Activa · 24/7</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-accent bg-accent/15 px-2.5 py-1 rounded-full border border-accent/20">
+                      ONLINE
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
