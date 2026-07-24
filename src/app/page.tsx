@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
+import { supabase } from '@/lib/supabase';
 import {
   Fuel,
   Droplets,
@@ -23,7 +24,23 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-const SUCURSALES_TELEMETRIA = [
+interface TelemetriaBomba {
+  id: number;
+  tipo: string;
+  precio: string;
+  nivel: string;
+  status: string;
+  color: string;
+}
+
+interface TelemetriaSucursal {
+  id: string;
+  nombre: string;
+  ciudad: string;
+  bombas: TelemetriaBomba[];
+}
+
+const DEFAULT_SUCURSALES_TELEMETRIA: TelemetriaSucursal[] = [
   {
     id: 'suc-001',
     nombre: 'Estación Central Dally',
@@ -60,8 +77,72 @@ const SUCURSALES_TELEMETRIA = [
 ];
 
 export default function LandingPage() {
+  const [sucursalesList, setSucursalesList] = useState<TelemetriaSucursal[]>(DEFAULT_SUCURSALES_TELEMETRIA);
   const [selectedSucursalIdx, setSelectedSucursalIdx] = useState(0);
-  const currentSucursal = SUCURSALES_TELEMETRIA[selectedSucursalIdx];
+
+  useEffect(() => {
+    async function fetchRealSucursales() {
+      try {
+        const [sucRes, surtRes] = await Promise.all([
+          supabase.from('sucursales').select('*').order('nombre', { ascending: true }),
+          supabase.from('surtidores').select('*').order('numero_bomba', { ascending: true }),
+        ]);
+
+        if (sucRes.data && sucRes.data.length > 0) {
+          const PRECIOS: Record<string, string> = {
+            'Gasolina Especial': 'Bs. 3.74/L',
+            'Diésel': 'Bs. 3.72/L',
+            'GNV': 'Bs. 1.66/m³',
+            'Premium': 'Bs. 4.79/L',
+          };
+
+          const COLORES: Record<string, string> = {
+            'Gasolina Especial': 'accent',
+            'Diésel': 'info',
+            'GNV': 'success',
+            'Premium': 'warning',
+          };
+
+          const dynamicSucursales: TelemetriaSucursal[] = sucRes.data.map((suc) => {
+            const bombasParaSuc = surtRes.data
+              ? surtRes.data.filter((s) => s.sucursal_id === suc.id)
+              : [];
+
+            return {
+              id: suc.id,
+              nombre: suc.nombre,
+              ciudad: `${suc.ciudad} — ${suc.direccion}`,
+              bombas:
+                bombasParaSuc.length > 0
+                  ? bombasParaSuc.map((b) => ({
+                      id: b.numero_bomba,
+                      tipo: b.combustible,
+                      precio: PRECIOS[b.combustible] || 'Bs. 4.00/L',
+                      nivel: `${Number(b.nivel_actual).toLocaleString('es-BO')} / ${Number(b.capacidad_maxima).toLocaleString('es-BO')} L`,
+                      status: 'normal',
+                      color: COLORES[b.combustible] || 'accent',
+                    }))
+                  : [
+                      { id: 1, tipo: 'Gasolina Especial', precio: 'Bs. 3.74/L', nivel: '10,500 / 15,000 L', status: 'normal', color: 'accent' },
+                      { id: 2, tipo: 'Diésel', precio: 'Bs. 3.72/L', nivel: '14,200 / 20,000 L', status: 'normal', color: 'info' },
+                      { id: 3, tipo: 'GNV', precio: 'Bs. 1.66/m³', nivel: '4,500 / 8,000 L', status: 'normal', color: 'success' },
+                      { id: 4, tipo: 'Premium', precio: 'Bs. 4.79/L', nivel: '7,100 / 10,000 L', status: 'normal', color: 'warning' },
+                    ],
+            };
+          });
+
+          setSucursalesList(dynamicSucursales);
+        }
+      } catch (e) {
+        console.error('Error cargando sucursales para telemetría:', e);
+      }
+    }
+
+    fetchRealSucursales();
+  }, []);
+
+  const safeIdx = selectedSucursalIdx < sucursalesList.length ? selectedSucursalIdx : 0;
+  const currentSucursal = sucursalesList[safeIdx] || sucursalesList[0];
 
   return (
     <main className="min-h-screen bg-background">
@@ -153,14 +234,14 @@ export default function LandingPage() {
                         {currentSucursal.nombre}
                       </span>
                     </div>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {SUCURSALES_TELEMETRIA.map((suc, idx) => (
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
+                      {sucursalesList.map((suc, idx) => (
                         <button
                           key={suc.id}
                           type="button"
                           onClick={() => setSelectedSucursalIdx(idx)}
-                          className={`text-[10px] font-bold py-2 px-2 rounded-xl border transition-all text-center truncate ${
-                            selectedSucursalIdx === idx
+                          className={`flex-1 min-w-[100px] text-[10px] font-bold py-1.5 px-2 rounded-xl border transition-all text-center truncate ${
+                            safeIdx === idx
                               ? 'border-accent bg-accent/25 text-accent shadow-md shadow-accent/10 font-black scale-[1.02]'
                               : 'border-border bg-surface/90 text-text-muted hover:text-text-primary hover:border-text-muted'
                           }`}
@@ -256,7 +337,7 @@ export default function LandingPage() {
             {[
               { value: '150,000 L', label: 'Importación diaria continua', icon: Droplets },
               { value: '100%', label: 'Garantía de reserva en tanques', icon: ShieldCheck },
-              { value: '28 Años', label: 'Superando coyunturas de escasez', icon: Timer },
+              { value: '2026', label: 'Inicio de importación directa', icon: Timer },
               { value: '360+', label: 'Flotas con suministro seguro', icon: Users },
             ].map((stat, i) => (
               <div
@@ -357,7 +438,7 @@ export default function LandingPage() {
             </h2>
 
             <p className="text-text-secondary text-lg leading-relaxed mb-6">
-              Dally SRL fue fundada en 1996 como una empresa tradicional de distribución de combustible en el sur del país. Con la apertura regulatoria de este 2026 para la libre importación de hidrocarburos por el sector privado, Dally SRL se convierte en pionera al iniciar la importación directa y el almacenamiento estratégico a gran escala.
+              Con la apertura regulatoria del sector de hidrocarburos en este 2026 para la libre importación por parte del sector privado en Bolivia, Dally SRL se consolida como empresa pionera al iniciar la importación directa y el almacenamiento estratégico a gran escala.
             </p>
             <p className="text-text-secondary text-lg leading-relaxed mb-12">
               Ante la actual coyuntura de escasez nacional, nuestra misión en este 2026 es actuar como una solución energética inmediata para Bolivia, garantizando que el transporte, las familias y las industrias dispongan de combustible confiable, continuo y medido con absoluta precisión.
@@ -460,69 +541,59 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <form
-            id="contact-form"
-            className="max-w-4xl"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* Embedded Google Maps (Dark Mode Styled) */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <label className="text-xs tracking-figma-wide text-text-muted block mb-2">
-                  NOMBRE
-                </label>
-                <input
-                  type="text"
-                  id="contact-nombre"
-                  placeholder="Juan Pérez"
-                  className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:border-accent focus:outline-none transition-colors"
-                />
+                <h3 className="text-lg font-bold tracking-figma text-text-primary">RED NACIONAL DE ESTACIONES EN MAPA</h3>
+                <p className="text-xs text-text-muted mt-0.5">Ubicaciones de abastecimiento estratégico en Santa Cruz y Cochabamba, Bolivia</p>
               </div>
-              <div>
-                <label className="text-xs tracking-figma-wide text-text-muted block mb-2">
-                  EMPRESA
-                </label>
-                <input
-                  type="text"
-                  id="contact-empresa"
-                  placeholder="Transportes S.A."
-                  className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:border-accent focus:outline-none transition-colors"
-                />
-              </div>
+              <span className="text-xs font-mono font-bold text-accent bg-accent/15 px-3 py-1 rounded-full border border-accent/20">
+                5 ESTACIONES ACTIVAS EN BOLIVIA
+              </span>
             </div>
 
-            <div className="mb-6">
-              <label className="text-xs tracking-figma-wide text-text-muted block mb-2">
-                CORREO ELECTRÓNICO
-              </label>
-              <input
-                type="email"
-                id="contact-email"
-                placeholder="correo@empresa.com"
-                className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:border-accent focus:outline-none transition-colors"
+            {/* Interactive Location Cards Grid */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { nombre: 'Estación Central Dally', ciudad: 'Santa Cruz', dir: 'Av. Petrolera 1450 (Parque Industrial)', estado: '24/7 Abierto' },
+                { nombre: 'Estación Norte Dally', ciudad: 'Santa Cruz', dir: 'Av. Banzer km 8 (Zona Norte)', estado: '24/7 Abierto' },
+                { nombre: 'Estación Equipetrol Dally', ciudad: 'Santa Cruz', dir: 'Av. San Martín (Zona Equipetrol)', estado: '24/7 Abierto' },
+                { nombre: 'Estación Quillacollo Dally', ciudad: 'Cochabamba', dir: 'Av. Blanco Galindo km 10 (Quillacollo)', estado: '24/7 Abierto' },
+                { nombre: 'Estación Sacaba Dally', ciudad: 'Cochabamba', dir: 'Av. Villazón km 4 (Sacaba)', estado: '24/7 Abierto' },
+              ].map((loc, i) => (
+                <div key={i} className="bg-surface border border-border hover:border-accent/50 rounded-xl p-4 transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-accent shrink-0" />
+                      <span className="text-xs font-bold text-text-primary">{loc.nombre}</span>
+                    </div>
+                    <span className="text-[9px] font-mono font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+                      {loc.ciudad}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-text-muted font-mono mb-2">{loc.dir}</p>
+                  <span className="inline-block text-[10px] font-bold text-success bg-success/15 px-2 py-0.5 rounded-full">
+                    {loc.estado}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Dark Mode Google Maps Embed */}
+            <div className="relative rounded-2xl overflow-hidden border-2 border-accent/30 shadow-2xl shadow-black/90">
+              <iframe
+                title="Mapa de Estaciones Dally SRL Bolivia"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15194.249767856417!2d-63.1821415!3d-17.7833215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x93f1e81255555555%3A0x123456789abcdef!2sSanta+Cruz+de+la+Sierra%2C+Bolivia!5e0!3m2!1ses!2sbo!4v1700000000000!5m2!1ses!2sbo"
+                width="100%"
+                height="420"
+                style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2)' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-
-            <div className="mb-8">
-              <label className="text-xs tracking-figma-wide text-text-muted block mb-2">
-                MENSAJE
-              </label>
-              <textarea
-                id="contact-mensaje"
-                rows={5}
-                placeholder="¿En qué podemos ayudarle?"
-                className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:border-accent focus:outline-none transition-colors resize-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              id="contact-submit"
-              className="w-full bg-accent hover:bg-accent-hover text-background font-bold tracking-figma py-4 rounded-lg transition-all hover:shadow-lg hover:shadow-accent/20"
-            >
-              ENVIAR MENSAJE
-            </button>
-          </form>
+          </div>
         </div>
       </section>
 

@@ -24,6 +24,13 @@ interface SurtidorInfo {
   sucursal_id: string;
 }
 
+interface SucursalInfo {
+  id: string;
+  nombre: string;
+  direccion: string;
+  ciudad: string;
+}
+
 interface DashboardData {
   kpis: {
     ventasHoy: number;
@@ -49,6 +56,7 @@ interface DashboardData {
   operadores: { nombre: string; email: string; rol: string; ventas: number; estado: boolean }[];
   reportesData: { id: string; meta: number }[];
   surtidores: SurtidorInfo[];
+  sucursales: SucursalInfo[];
 }
 
 // Precio por defecto según tipo de combustible (Bs.)
@@ -524,6 +532,7 @@ export default function DashboardPage() {
               <div className="animate-fade-in">
                 <NuevaVentaTab
                   surtidores={data.surtidores}
+                  sucursales={data.sucursales || []}
                   onVentaRegistrada={fetchData}
                 />
               </div>
@@ -551,10 +560,12 @@ export default function DashboardPage() {
 
 interface NuevaVentaTabProps {
   surtidores: SurtidorInfo[];
+  sucursales: SucursalInfo[];
   onVentaRegistrada: () => void;
 }
 
-function NuevaVentaTab({ surtidores, onVentaRegistrada }: NuevaVentaTabProps) {
+function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVentaTabProps) {
+  const [selectedSucursalId, setSelectedSucursalId] = useState<string>('');
   const [selectedSurtidor, setSelectedSurtidor] = useState<SurtidorInfo | null>(null);
   const [litros, setLitros] = useState<string>('');
   const [precioPorLitro, setPrecioPorLitro] = useState<string>('');
@@ -565,6 +576,10 @@ function NuevaVentaTab({ surtidores, onVentaRegistrada }: NuevaVentaTabProps) {
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const filteredSurtidores = selectedSucursalId
+    ? surtidores.filter((s) => s.sucursal_id === selectedSucursalId)
+    : [];
 
   const totalCalculado = parseFloat(litros || '0') * parseFloat(precioPorLitro || '0');
   const litrosNum = parseFloat(litros || '0');
@@ -648,7 +663,46 @@ function NuevaVentaTab({ surtidores, onVentaRegistrada }: NuevaVentaTabProps) {
         </div>
         <div>
           <h2 className="text-lg font-bold tracking-figma text-text-primary">NUEVA VENTA DE COMBUSTIBLE</h2>
-          <p className="text-xs text-text-muted mt-0.5">Registrar despacho como administrador del sistema</p>
+          <p className="text-xs text-text-muted mt-0.5">Paso 1: Selecciona una sucursal obligatoriamente → Paso 2: Elige el surtidor</p>
+        </div>
+      </div>
+
+      {/* 1. SELECCIONAR SUCURSAL (OBLIGATORIO) */}
+      <div className="bg-surface border border-border rounded-xl p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <label htmlFor="select-sucursal" className="text-xs font-bold tracking-figma-wide text-accent flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-accent" /> 1. SELECCIONAR SUCURSAL / ESTACIÓN (OBLIGATORIO)
+          </label>
+          <span className="text-xs font-mono text-text-muted">
+            {sucursales.length} estaciones registradas
+          </span>
+        </div>
+
+        <div className="relative">
+          <select
+            id="select-sucursal"
+            value={selectedSucursalId}
+            onChange={(e) => {
+              setSelectedSucursalId(e.target.value);
+              setSelectedSurtidor(null);
+            }}
+            className="w-full bg-surface-alt border-2 border-border focus:border-accent text-text-primary text-sm font-semibold rounded-xl px-4 py-3.5 appearance-none focus:outline-none transition-colors cursor-pointer"
+          >
+            <option value="" disabled>
+              -- Selecciona la estación de servicio para operar --
+            </option>
+            {sucursales.map((suc) => {
+              const countBombas = surtidores.filter((s) => s.sucursal_id === suc.id).length;
+              return (
+                <option key={suc.id} value={suc.id} className="bg-surface text-text-primary font-medium py-2">
+                  📍 {suc.nombre} ({suc.ciudad}) — {countBombas} bomba{countBombas !== 1 ? 's' : ''} disponible{countBombas !== 1 ? 's' : ''}
+                </option>
+              );
+            })}
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-accent font-mono text-xs">
+            ▼
+          </div>
         </div>
       </div>
 
@@ -669,14 +723,24 @@ function NuevaVentaTab({ surtidores, onVentaRegistrada }: NuevaVentaTabProps) {
       <div className="grid lg:grid-cols-5 gap-8">
         {/* ===== Left: Surtidor Selection ===== */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs tracking-figma-wide text-text-muted">SELECCIONAR SURTIDOR</h3>
+          <h3 className="text-xs tracking-figma-wide text-text-muted">2. SELECCIONAR BOMBA DE LA SUCURSAL</h3>
           <div className="grid gap-3">
-            {surtidores.length === 0 ? (
+            {!selectedSucursalId ? (
+              <div className="bg-surface/80 border border-accent/30 rounded-xl p-8 text-center space-y-3">
+                <Building2 className="w-8 h-8 text-accent mx-auto opacity-70 animate-bounce" />
+                <p className="text-xs font-bold text-text-primary uppercase tracking-wider">
+                  Selecciona una sucursal arriba
+                </p>
+                <p className="text-[11px] text-text-muted leading-relaxed">
+                  Para evitar errores de despacho, debes elegir primero la estación de servicio arriba para cargar sus bombas disponibles.
+                </p>
+              </div>
+            ) : filteredSurtidores.length === 0 ? (
               <div className="bg-surface border border-border rounded-xl p-6 text-center text-text-muted text-sm">
-                No hay surtidores disponibles
+                No hay surtidores registrados para esta sucursal
               </div>
             ) : (
-              surtidores.map((s) => {
+              filteredSurtidores.map((s) => {
                 const pct = Math.min(100, (s.nivel_actual / s.capacidad_maxima) * 100);
                 const isSelected = selectedSurtidor?.id === s.id;
                 const color = FUEL_COLORS[s.combustible] || '#8B5CF6';

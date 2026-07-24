@@ -38,6 +38,7 @@ export async function GET() {
       alertasRes,
       usuariosRes,
       surtidoresRes,
+      sucursalesRes,
     ] = await Promise.all([
       // Ventas de hoy
       supabase
@@ -74,6 +75,11 @@ export async function GET() {
         .from('surtidores')
         .select('*')
         .order('numero_bomba', { ascending: true }),
+      // Sucursales
+      supabase
+        .from('sucursales')
+        .select('*')
+        .order('nombre', { ascending: true }),
     ]);
 
     const ventasHoy = ventasHoyRes.data || [];
@@ -82,6 +88,7 @@ export async function GET() {
     const alertas = alertasRes.data || [];
     const usuarios = usuariosRes.data || [];
     const surtidores = surtidoresRes.data || [];
+    const sucursales = sucursalesRes.data || [];
 
     // --- Calculate KPIs ---
     const totalVentasHoy = ventasHoy.reduce((sum: number, v: { total: number }) => sum + Number(v.total), 0);
@@ -206,6 +213,7 @@ export async function GET() {
       alertas,
       operadores,
       surtidores,
+      sucursales,
       reportesData,
     });
   } catch (error) {
