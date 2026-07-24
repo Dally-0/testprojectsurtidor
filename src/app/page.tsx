@@ -493,7 +493,7 @@ export default function LandingPage() {
                   DIRECCIÓN
                 </span>
                 <span className="text-sm text-text-secondary">
-                  Av. Petrolera 1450, Parque Industrial Sur, Santa Cruz de la Sierra
+                  Av. Blanco Galindo km 10, Zona Industrial Quillacollo, Cochabamba
                 </span>
               </div>
             </div>
@@ -507,7 +507,7 @@ export default function LandingPage() {
                   TELÉFONO
                 </span>
                 <span className="text-sm text-text-secondary">
-                  +591 3 344-7800 / +591 70-123-456
+                  +591 4 458-9200 / +591 70-123-456
                 </span>
               </div>
             </div>
@@ -545,8 +545,8 @@ export default function LandingPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold tracking-figma text-text-primary">RED NACIONAL DE ESTACIONES EN MAPA</h3>
-                <p className="text-xs text-text-muted mt-0.5">Ubicaciones de abastecimiento estratégico en Santa Cruz y Cochabamba, Bolivia</p>
+                <h3 className="text-lg font-bold tracking-figma text-text-primary">RED DE ESTACIONES EN MAPA</h3>
+                <p className="text-xs text-text-muted mt-0.5">Ubicaciones de abastecimiento estratégico en Cochabamba y Bolivia</p>
               </div>
               <span className="text-xs font-mono font-bold text-accent bg-accent/15 px-3 py-1 rounded-full border border-accent/20">
                 5 ESTACIONES ACTIVAS EN BOLIVIA
@@ -556,11 +556,11 @@ export default function LandingPage() {
             {/* Interactive Location Cards Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
+                { nombre: 'Estación Quillacollo Dally', ciudad: 'Cochabamba', dir: 'Av. Blanco Galindo km 10 (Quillacollo)', estado: '24/7 Abierto' },
+                { nombre: 'Estación Sacaba Dally', ciudad: 'Cochabamba', dir: 'Av. Villazón km 4 (Sacaba)', estado: '24/7 Abierto' },
                 { nombre: 'Estación Central Dally', ciudad: 'Santa Cruz', dir: 'Av. Petrolera 1450 (Parque Industrial)', estado: '24/7 Abierto' },
                 { nombre: 'Estación Norte Dally', ciudad: 'Santa Cruz', dir: 'Av. Banzer km 8 (Zona Norte)', estado: '24/7 Abierto' },
                 { nombre: 'Estación Equipetrol Dally', ciudad: 'Santa Cruz', dir: 'Av. San Martín (Zona Equipetrol)', estado: '24/7 Abierto' },
-                { nombre: 'Estación Quillacollo Dally', ciudad: 'Cochabamba', dir: 'Av. Blanco Galindo km 10 (Quillacollo)', estado: '24/7 Abierto' },
-                { nombre: 'Estación Sacaba Dally', ciudad: 'Cochabamba', dir: 'Av. Villazón km 4 (Sacaba)', estado: '24/7 Abierto' },
               ].map((loc, i) => (
                 <div key={i} className="bg-surface border border-border hover:border-accent/50 rounded-xl p-4 transition-colors">
                   <div className="flex items-center justify-between mb-1">
@@ -580,11 +580,11 @@ export default function LandingPage() {
               ))}
             </div>
 
-            {/* Dark Mode Google Maps Embed */}
+            {/* Dark Mode Google Maps Embed (Cochabamba) */}
             <div className="relative rounded-2xl overflow-hidden border-2 border-accent/30 shadow-2xl shadow-black/90">
               <iframe
-                title="Mapa de Estaciones Dally SRL Bolivia"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15194.249767856417!2d-63.1821415!3d-17.7833215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x93f1e81255555555%3A0x123456789abcdef!2sSanta+Cruz+de+la+Sierra%2C+Bolivia!5e0!3m2!1ses!2sbo!4v1700000000000!5m2!1ses!2sbo"
+                title="Mapa de Estaciones Dally SRL Cochabamba Bolivia"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3807.4123456789!2d-66.1568!3d-17.3895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x93e373d123456789%3A0x123456789abcdef!2sCochabamba%2C+Bolivia!5e0!3m2!1ses!2sbo!4v1700000000000!5m2!1ses!2sbo"
                 width="100%"
                 height="420"
                 style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2)' }}
