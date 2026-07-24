@@ -357,10 +357,10 @@ export default function LandingPage() {
             </h2>
 
             <p className="text-text-secondary text-lg leading-relaxed mb-6">
-              Dally SRL nació en 1996 y a lo largo de 28 años ha superado múltiples crisis de suministro energético. Ante la actual coyuntura de escasez en el mercado de hidrocarburos, hemos consolidado alianzas estratégicas para la importación directa y almacenamiento de gran capacidad.
+              Dally SRL fue fundada en 1996 como una empresa tradicional de distribución de combustible en el sur del país. Con la apertura regulatoria de este 2026 para la libre importación de hidrocarburos por el sector privado, Dally SRL se convierte en pionera al iniciar la importación directa y el almacenamiento estratégico a gran escala.
             </p>
             <p className="text-text-secondary text-lg leading-relaxed mb-12">
-              Nuestra misión es clara: actuar como un pilar energético de emergencia para Bolivia, asegurando que las empresas, las familias y el transporte tengan combustible confiable y medido con precisión en cada surtidor.
+              Ante la actual coyuntura de escasez nacional, nuestra misión en este 2026 es actuar como una solución energética inmediata para Bolivia, garantizando que el transporte, las familias y las industrias dispongan de combustible confiable, continuo y medido con absoluta precisión.
             </p>
 
             {/* Badges */}
