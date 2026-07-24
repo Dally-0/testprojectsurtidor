@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
@@ -17,10 +18,51 @@ import {
   Phone,
   Mail,
   Timer,
-  LayoutDashboard,
+  Building2,
+  ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 
+const SUCURSALES_TELEMETRIA = [
+  {
+    id: 'suc-001',
+    nombre: 'Estación Central Dally',
+    ciudad: 'Santa Cruz — Parque Industrial',
+    bombas: [
+      { id: 1, tipo: 'Gasolina Especial', precio: 'Bs. 3.74/L', nivel: '8,500 / 15,000 L', status: 'normal', color: 'accent' },
+      { id: 2, tipo: 'Diésel B5', precio: 'Bs. 3.72/L', nivel: '12,000 / 20,000 L', status: 'normal', color: 'info' },
+      { id: 3, tipo: 'GNV Comprimido', precio: 'Bs. 1.66/m³', nivel: '200 BAR (3,200 L)', status: 'warning', color: 'success' },
+      { id: 4, tipo: 'Premium 95', precio: 'Bs. 4.79/L', nivel: '6,800 / 10,000 L', status: 'normal', color: 'warning' },
+    ],
+  },
+  {
+    id: 'suc-002',
+    nombre: 'Estación Norte Dally',
+    ciudad: 'Santa Cruz — Av. Banzer km 8',
+    bombas: [
+      { id: 1, tipo: 'Gasolina Especial', precio: 'Bs. 3.74/L', nivel: '11,200 / 15,000 L', status: 'normal', color: 'accent' },
+      { id: 2, tipo: 'Diésel B5', precio: 'Bs. 3.72/L', nivel: '15,800 / 20,000 L', status: 'normal', color: 'info' },
+      { id: 3, tipo: 'GNV Comprimido', precio: 'Bs. 1.66/m³', nivel: '210 BAR (5,400 L)', status: 'normal', color: 'success' },
+      { id: 4, tipo: 'Premium 95', precio: 'Bs. 4.79/L', nivel: '8,100 / 10,000 L', status: 'normal', color: 'warning' },
+    ],
+  },
+  {
+    id: 'suc-003',
+    nombre: 'Estación Equipetrol Dally',
+    ciudad: 'Santa Cruz — Av. San Martín',
+    bombas: [
+      { id: 1, tipo: 'Gasolina Especial', precio: 'Bs. 3.74/L', nivel: '9,400 / 15,000 L', status: 'normal', color: 'accent' },
+      { id: 2, tipo: 'Diésel B5', precio: 'Bs. 3.72/L', nivel: '14,000 / 20,000 L', status: 'normal', color: 'info' },
+      { id: 3, tipo: 'GNV Comprimido', precio: 'Bs. 1.66/m³', nivel: '195 BAR (2,800 L)', status: 'warning', color: 'success' },
+      { id: 4, tipo: 'Premium 95', precio: 'Bs. 4.79/L', nivel: '7,500 / 10,000 L', status: 'normal', color: 'warning' },
+    ],
+  },
+];
+
 export default function LandingPage() {
+  const [selectedSucursalIdx, setSelectedSucursalIdx] = useState(0);
+  const currentSucursal = SUCURSALES_TELEMETRIA[selectedSucursalIdx];
+
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
@@ -62,56 +104,130 @@ export default function LandingPage() {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4 animate-fade-in-up stagger-3 opacity-0">
-                <Link
-                  href="/dashboard"
-                  id="hero-cta-dashboard"
-                  className="group inline-flex items-center gap-2.5 bg-accent hover:bg-accent-hover text-background font-bold tracking-figma px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  ACCEDER AL DASHBOARD
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
                 <a
                   href="#servicios"
                   id="hero-cta-services"
-                  className="inline-flex items-center gap-2 border border-border hover:border-text-secondary text-text-primary font-semibold tracking-figma px-8 py-3.5 rounded-xl transition-all hover:bg-surface"
+                  className="group inline-flex items-center gap-2.5 bg-accent hover:bg-accent-hover text-background font-bold tracking-figma px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30"
                 >
                   VER SERVICIOS
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a
+                  href="#contacto"
+                  id="hero-cta-contact"
+                  className="inline-flex items-center gap-2 border border-border hover:border-text-secondary text-text-primary font-semibold tracking-figma px-8 py-3.5 rounded-xl transition-all hover:bg-surface"
+                >
+                  CONTACTAR
                 </a>
               </div>
             </div>
 
-            {/* Right Column — Hero Visual Showcase */}
+            {/* Right Column — Hero Visual Showcase: Realistic Bolivian Fuel Pumps Display */}
             <div className="lg:col-span-5 relative animate-fade-in-up stagger-4 opacity-0">
               <div className="relative mx-auto max-w-lg lg:max-w-none">
-                {/* Glow Ring Behind Image */}
-                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-accent/50 via-accent/20 to-transparent blur-xl opacity-70 animate-pulse-glow" />
+                {/* Glow Ring Behind Terminal */}
+                <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-r from-accent/60 via-accent/25 to-yellow-500/20 blur-2xl opacity-80 animate-pulse-glow" />
 
-                {/* Glassmorphic Frame Card */}
-                <div className="relative rounded-2xl bg-surface/90 border border-accent/30 overflow-hidden shadow-2xl shadow-black/90">
-                  <div className="relative aspect-[4/3] w-full">
+                {/* Surtidor Box Terminal */}
+                <div className="relative rounded-2xl bg-surface/95 border-2 border-accent/40 overflow-hidden shadow-2xl shadow-black/95">
+                  {/* Top Canopy Bar */}
+                  <div className="bg-gradient-to-r from-surface-alt via-accent/20 to-surface-alt px-5 py-3.5 border-b border-border flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center">
+                        <Fuel className="w-4 h-4 text-accent" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black tracking-figma text-text-primary">{currentSucursal.nombre}</p>
+                        <p className="text-[10px] font-mono text-text-muted">{currentSucursal.ciudad.toUpperCase()}</p>
+                      </div>
+                    </div>
+                    <span className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-success bg-success/15 border border-success/30 px-2.5 py-0.5 rounded-full">
+                      <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                      EN LÍNEA
+                    </span>
+                  </div>
+
+                  {/* Hero Graphic Image Frame */}
+                  <div className="relative aspect-[16/9] w-full border-b border-border/80 overflow-hidden">
                     <Image
                       src="/fuel_station_hero.png"
-                      alt="Dally SRL Surtidor de Combustible Digital"
+                      alt="Surtidor de Combustible Dally SRL"
                       fill
                       priority
                       className="object-cover object-center transition-transform duration-700 hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent" />
+                    <div className="absolute top-3 right-3 bg-background/80 backdrop-blur border border-border rounded-lg px-2.5 py-1 text-[10px] font-mono text-accent">
+                      BOMBAS 1 - 4
+                    </div>
                   </div>
 
-                  {/* Live Status Overlay Badge */}
-                  <div className="absolute bottom-4 left-4 right-4 p-4 glass rounded-xl border border-white/10 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-success animate-pulse" />
-                      <div>
-                        <p className="text-xs font-bold text-text-primary tracking-figma">SURTIDORES DALLY SRL</p>
-                        <p className="text-[10px] text-text-muted">Telemetría de Bomba Activa · 24/7</p>
-                      </div>
+                  {/* Sucursal Selector Tabs / Buttons */}
+                  <div className="px-4 pt-3 pb-2 border-b border-border bg-surface-alt/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] tracking-figma-wide text-text-muted font-bold flex items-center gap-1">
+                        <Building2 className="w-3 h-3 text-accent" /> SELECCIONAR SUCURSAL
+                      </span>
+                      <span className="text-[10px] text-accent font-mono">
+                        {selectedSucursalIdx + 1} de {SUCURSALES_TELEMETRIA.length}
+                      </span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-accent bg-accent/15 px-2.5 py-1 rounded-full border border-accent/20">
-                      ONLINE
-                    </span>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {SUCURSALES_TELEMETRIA.map((suc, idx) => (
+                        <button
+                          key={suc.id}
+                          type="button"
+                          onClick={() => setSelectedSucursalIdx(idx)}
+                          className={`text-[10px] font-bold py-1.5 px-2 rounded-lg border transition-all text-center truncate ${
+                            selectedSucursalIdx === idx
+                              ? 'border-accent bg-accent/20 text-accent shadow-sm'
+                              : 'border-border bg-surface/80 text-text-muted hover:text-text-primary hover:border-text-muted'
+                          }`}
+                        >
+                          {suc.nombre.replace('Estación ', '')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Realistic Fuel Dispensers Grid (Bolivia Style) */}
+                  <div className="p-4 space-y-3 bg-surface/60">
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {currentSucursal.bombas.map((bomba) => (
+                        <div
+                          key={bomba.id}
+                          className={`bg-surface-alt/90 border rounded-xl p-3 transition-colors ${
+                            bomba.color === 'accent'
+                              ? 'border-accent/30 hover:border-accent'
+                              : bomba.color === 'info'
+                              ? 'border-info/30 hover:border-info'
+                              : bomba.color === 'success'
+                              ? 'border-success/30 hover:border-success'
+                              : 'border-warning/30 hover:border-warning'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className={`text-[11px] font-bold font-mono text-${bomba.color}`}>
+                              BOMBA #{bomba.id}
+                            </span>
+                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded bg-${bomba.color}/20 text-${bomba.color}`}>
+                              {bomba.precio}
+                            </span>
+                          </div>
+                          <p className="text-xs font-bold text-text-primary mb-1 truncate">{bomba.tipo}</p>
+                          <div className="bg-background/90 rounded border border-border p-1.5 font-mono text-center">
+                            <span className="text-[10px] text-text-muted block">TANQUE</span>
+                            <span className="text-xs font-bold text-text-primary">{bomba.nivel}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Terminal Footer */}
+                  <div className="px-4 py-2.5 bg-surface border-t border-border flex items-center justify-between">
+                    <span className="text-[10px] text-text-muted font-mono">TELEMETRÍA EN TIEMPO REAL</span>
+                    <span className="text-[10px] text-accent font-mono font-semibold">SUPABASE CONNECTED</span>
                   </div>
                 </div>
               </div>
