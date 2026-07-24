@@ -76,9 +76,48 @@ const DEFAULT_SUCURSALES_TELEMETRIA: TelemetriaSucursal[] = [
   },
 ];
 
+const ESTACIONES_MAPA = [
+  {
+    nombre: 'Estación Quillacollo Dally',
+    ciudad: 'Cochabamba',
+    dir: 'Av. Blanco Galindo km 10 (Quillacollo)',
+    estado: '24/7 Abierto',
+    mapUrl: 'https://maps.google.com/maps?q=Av+Blanco+Galindo+km+10+Quillacollo+Cochabamba+Bolivia&t=&z=15&ie=UTF8&iwloc=&output=embed',
+  },
+  {
+    nombre: 'Estación Sacaba Dally',
+    ciudad: 'Cochabamba',
+    dir: 'Av. Villazón km 4 (Sacaba)',
+    estado: '24/7 Abierto',
+    mapUrl: 'https://maps.google.com/maps?q=Av+Villazon+km+4+Sacaba+Cochabamba+Bolivia&t=&z=15&ie=UTF8&iwloc=&output=embed',
+  },
+  {
+    nombre: 'Estación Central Dally',
+    ciudad: 'Santa Cruz',
+    dir: 'Av. Petrolera 1450 (Parque Industrial)',
+    estado: '24/7 Abierto',
+    mapUrl: 'https://maps.google.com/maps?q=Parque+Industrial+Santa+Cruz+de+la+Sierra+Bolivia&t=&z=15&ie=UTF8&iwloc=&output=embed',
+  },
+  {
+    nombre: 'Estación Norte Dally',
+    ciudad: 'Santa Cruz',
+    dir: 'Av. Banzer km 8 (Zona Norte)',
+    estado: '24/7 Abierto',
+    mapUrl: 'https://maps.google.com/maps?q=Av+Banzer+km+8+Santa+Cruz+de+la+Sierra+Bolivia&t=&z=15&ie=UTF8&iwloc=&output=embed',
+  },
+  {
+    nombre: 'Estación Equipetrol Dally',
+    ciudad: 'Santa Cruz',
+    dir: 'Av. San Martín (Zona Equipetrol)',
+    estado: '24/7 Abierto',
+    mapUrl: 'https://maps.google.com/maps?q=Av+San+Martin+Equipetrol+Santa+Cruz+de+la+Sierra+Bolivia&t=&z=15&ie=UTF8&iwloc=&output=embed',
+  },
+];
+
 export default function LandingPage() {
   const [sucursalesList, setSucursalesList] = useState<TelemetriaSucursal[]>(DEFAULT_SUCURSALES_TELEMETRIA);
   const [selectedSucursalIdx, setSelectedSucursalIdx] = useState(0);
+  const [selectedMapIdx, setSelectedMapIdx] = useState(0);
 
   useEffect(() => {
     async function fetchRealSucursales() {
@@ -545,46 +584,78 @@ export default function LandingPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold tracking-figma text-text-primary">RED DE ESTACIONES EN MAPA</h3>
-                <p className="text-xs text-text-muted mt-0.5">Ubicaciones de abastecimiento estratégico en Cochabamba y Bolivia</p>
+                <h3 className="text-lg font-bold tracking-figma text-text-primary">RED DE ESTACIONES EN MAPA INTERACTIVO</h3>
+                <p className="text-xs text-text-muted mt-0.5">Haz clic en cualquier sucursal para centrar el mapa en su ubicación aproximada</p>
               </div>
               <span className="text-xs font-mono font-bold text-accent bg-accent/15 px-3 py-1 rounded-full border border-accent/20">
-                5 ESTACIONES ACTIVAS EN BOLIVIA
+                5 ESTACIONES REGISTRADAS
               </span>
             </div>
 
             {/* Interactive Location Cards Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { nombre: 'Estación Quillacollo Dally', ciudad: 'Cochabamba', dir: 'Av. Blanco Galindo km 10 (Quillacollo)', estado: '24/7 Abierto' },
-                { nombre: 'Estación Sacaba Dally', ciudad: 'Cochabamba', dir: 'Av. Villazón km 4 (Sacaba)', estado: '24/7 Abierto' },
-                { nombre: 'Estación Central Dally', ciudad: 'Santa Cruz', dir: 'Av. Petrolera 1450 (Parque Industrial)', estado: '24/7 Abierto' },
-                { nombre: 'Estación Norte Dally', ciudad: 'Santa Cruz', dir: 'Av. Banzer km 8 (Zona Norte)', estado: '24/7 Abierto' },
-                { nombre: 'Estación Equipetrol Dally', ciudad: 'Santa Cruz', dir: 'Av. San Martín (Zona Equipetrol)', estado: '24/7 Abierto' },
-              ].map((loc, i) => (
-                <div key={i} className="bg-surface border border-border hover:border-accent/50 rounded-xl p-4 transition-colors">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-accent shrink-0" />
-                      <span className="text-xs font-bold text-text-primary">{loc.nombre}</span>
+              {ESTACIONES_MAPA.map((loc, i) => {
+                const isSelected = selectedMapIdx === i;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedMapIdx(i)}
+                    className={`text-left rounded-xl p-4 transition-all duration-300 cursor-pointer ${
+                      isSelected
+                        ? 'bg-accent/10 border-2 border-accent shadow-lg shadow-accent/15 scale-[1.02]'
+                        : 'bg-surface border border-border hover:border-accent/50 hover:bg-surface-hover'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <MapPin className={`w-4 h-4 shrink-0 ${isSelected ? 'text-accent animate-bounce' : 'text-text-muted'}`} />
+                        <span className={`text-xs font-bold ${isSelected ? 'text-accent font-black' : 'text-text-primary'}`}>
+                          {loc.nombre}
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-mono font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+                        {loc.ciudad}
+                      </span>
                     </div>
-                    <span className="text-[9px] font-mono font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
-                      {loc.ciudad}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-text-muted font-mono mb-2">{loc.dir}</p>
-                  <span className="inline-block text-[10px] font-bold text-success bg-success/15 px-2 py-0.5 rounded-full">
-                    {loc.estado}
-                  </span>
-                </div>
-              ))}
+                    <p className="text-[11px] text-text-muted font-mono mb-2">{loc.dir}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="inline-block text-[10px] font-bold text-success bg-success/15 px-2 py-0.5 rounded-full">
+                        {loc.estado}
+                      </span>
+                      {isSelected && (
+                        <span className="text-[10px] font-bold text-accent bg-accent/20 px-2 py-0.5 rounded-full font-mono animate-pulse">
+                          VER EN MAPA 📍
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Dark Mode Google Maps Embed (Cochabamba) */}
-            <div className="relative rounded-2xl overflow-hidden border-2 border-accent/30 shadow-2xl shadow-black/90">
+            {/* Dark Mode Google Maps Embed (Dynamic Panning) */}
+            <div className="relative rounded-2xl overflow-hidden border-2 border-accent/40 shadow-2xl shadow-black/90 transition-all">
+              {/* Map Location Banner Badge */}
+              <div className="bg-surface-alt/90 backdrop-blur-md px-4 py-2 border-b border-border flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-accent" />
+                  <span className="text-xs font-bold text-text-primary">
+                    {ESTACIONES_MAPA[selectedMapIdx].nombre}
+                  </span>
+                  <span className="text-[10px] text-text-muted font-mono">
+                    ({ESTACIONES_MAPA[selectedMapIdx].dir})
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-success font-bold bg-success/15 px-2 py-0.5 rounded-full">
+                  UBICACIÓN EN VIVO
+                </span>
+              </div>
+
               <iframe
-                title="Mapa de Estaciones Dally SRL Cochabamba Bolivia"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3807.4123456789!2d-66.1568!3d-17.3895!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x93e373d123456789%3A0x123456789abcdef!2sCochabamba%2C+Bolivia!5e0!3m2!1ses!2sbo!4v1700000000000!5m2!1ses!2sbo"
+                key={selectedMapIdx}
+                title={`Mapa de ${ESTACIONES_MAPA[selectedMapIdx].nombre}`}
+                src={ESTACIONES_MAPA[selectedMapIdx].mapUrl}
                 width="100%"
                 height="420"
                 style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2)' }}
