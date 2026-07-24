@@ -210,14 +210,14 @@ export default function LandingPage() {
               </div>
 
               {/* Main Heading */}
-              <h1 className="heading-figma text-4xl sm:text-6xl md:text-7xl lg:text-7xl mb-6 leading-none animate-fade-in-up stagger-1 opacity-0">
+              <h1 className="heading-figma text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-6 leading-none animate-fade-in-up stagger-1 opacity-0">
                 COMBUSTIBLE<br />
                 <span className="text-accent">DE CALIDAD Y</span><br />
                 DESPACHO ÁGIL
               </h1>
 
               {/* Subtitle */}
-              <p className="text-text-secondary text-base sm:text-lg md:text-xl max-w-2xl mb-10 leading-relaxed animate-fade-in-up stagger-2 opacity-0">
+              <p className="text-text-secondary text-base sm:text-lg max-w-2xl mb-8 leading-relaxed animate-fade-in-up stagger-2 opacity-0">
                 Frente a los desafíos de abastecimiento y la escasez nacional, Dally SRL lidera la importación directa y distribución continua de combustibles en Bolivia para que el transporte y la industria jamás se detengan.
               </p>
 
@@ -226,7 +226,7 @@ export default function LandingPage() {
                 <a
                   href="#servicios"
                   id="hero-cta-services"
-                  className="group inline-flex items-center gap-2.5 bg-accent hover:bg-accent-hover text-background font-bold tracking-figma px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30"
+                  className="group inline-flex items-center gap-2.5 bg-accent hover:bg-accent-hover text-background font-bold tracking-figma px-7 py-3 rounded-xl transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30 text-sm"
                 >
                   SOLUCIONES DE ABASTECIMIENTO
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -234,7 +234,7 @@ export default function LandingPage() {
                 <a
                   href="#contacto"
                   id="hero-cta-contact"
-                  className="inline-flex items-center gap-2 border border-border hover:border-text-secondary text-text-primary font-semibold tracking-figma px-8 py-3.5 rounded-xl transition-all hover:bg-surface"
+                  className="inline-flex items-center gap-2 border border-border hover:border-text-secondary text-text-primary font-semibold tracking-figma px-7 py-3 rounded-xl transition-all hover:bg-surface text-sm"
                 >
                   RESERVA PARA FLOTAS
                 </a>
@@ -242,8 +242,8 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column — Hero Visual Showcase: Realistic Bolivian Fuel Pumps Display */}
-            <div className="lg:col-span-5 relative animate-fade-in-up stagger-4 opacity-0">
-              <div className="relative mx-auto max-w-lg lg:max-w-none">
+            <div className="lg:col-span-5 relative animate-fade-in-up stagger-4 opacity-0 w-full max-w-lg lg:max-w-none mx-auto">
+              <div className="relative">
                 {/* Glow Ring Behind Terminal */}
                 <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-r from-accent/60 via-accent/25 to-yellow-500/20 blur-2xl opacity-80 animate-pulse-glow" />
 
@@ -251,35 +251,35 @@ export default function LandingPage() {
                 <div className="relative rounded-2xl bg-surface/95 border-2 border-accent/40 overflow-hidden shadow-2xl shadow-black/95">
                   
                   {/* ===== TOP PROMINENT BANNER LABEL ===== */}
-                  <div className="bg-gradient-to-r from-accent via-accent-hover to-accent text-background px-4 py-2.5 flex items-center justify-between shadow-md">
-                    <div className="flex items-center gap-2">
-                      <Fuel className="w-4 h-4 text-background shrink-0" />
-                      <span className="text-xs font-black tracking-wide uppercase">
+                  <div className="bg-gradient-to-r from-accent via-accent-hover to-accent text-background px-3.5 sm:px-4 py-2 flex items-center justify-between gap-2 shadow-md">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Fuel className="w-3.5 h-3.5 text-background shrink-0" />
+                      <span className="text-[11px] sm:text-xs font-black tracking-wide uppercase truncate">
                         Verifica la cantidad de gasolina en nuestros surtidores
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold bg-background/20 px-2 py-0.5 rounded text-background">
+                    <span className="text-[9px] sm:text-[10px] font-mono font-bold bg-background/20 px-2 py-0.5 rounded text-background shrink-0">
                       EN VIVO
                     </span>
                   </div>
 
                   {/* ===== SUCURSAL SELECTOR BUTTONS AT THE TOP ===== */}
-                  <div className="px-4 pt-3.5 pb-3 border-b border-border bg-surface-alt/70">
-                    <div className="flex items-center justify-between mb-2">
+                  <div className="px-3.5 pt-3 pb-2.5 border-b border-border bg-surface-alt/70">
+                    <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[10px] tracking-figma-wide text-text-muted font-bold flex items-center gap-1">
                         <Building2 className="w-3.5 h-3.5 text-accent" /> ELEGIR SUCURSAL:
                       </span>
-                      <span className="text-[10px] text-accent font-mono font-bold">
+                      <span className="text-[10px] text-accent font-mono font-bold truncate max-w-[180px]">
                         {currentSucursal.nombre}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
+                    <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto pr-1">
                       {sucursalesList.map((suc, idx) => (
                         <button
                           key={suc.id}
                           type="button"
                           onClick={() => setSelectedSucursalIdx(idx)}
-                          className={`flex-1 min-w-[100px] text-[10px] font-bold py-1.5 px-2 rounded-xl border transition-all text-center truncate ${
+                          className={`flex-1 min-w-[90px] text-[10px] font-bold py-1 px-2 rounded-lg border transition-all text-center truncate ${
                             safeIdx === idx
                               ? 'border-accent bg-accent/25 text-accent shadow-md shadow-accent/10 font-black scale-[1.02]'
                               : 'border-border bg-surface/90 text-text-muted hover:text-text-primary hover:border-text-muted'
@@ -292,24 +292,24 @@ export default function LandingPage() {
                   </div>
 
                   {/* Top Station Header Bar */}
-                  <div className="bg-gradient-to-r from-surface-alt via-accent/15 to-surface-alt px-5 py-3 border-b border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center">
-                        <Fuel className="w-4 h-4 text-accent" />
+                  <div className="bg-gradient-to-r from-surface-alt via-accent/15 to-surface-alt px-4 py-2 border-b border-border flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center">
+                        <Fuel className="w-3.5 h-3.5 text-accent" />
                       </div>
-                      <div>
-                        <p className="text-xs font-black tracking-figma text-text-primary">{currentSucursal.nombre}</p>
-                        <p className="text-[10px] font-mono text-text-muted">{currentSucursal.ciudad.toUpperCase()}</p>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black tracking-figma text-text-primary truncate">{currentSucursal.nombre}</p>
+                        <p className="text-[9px] font-mono text-text-muted truncate">{currentSucursal.ciudad.toUpperCase()}</p>
                       </div>
                     </div>
-                    <span className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-success bg-success/15 border border-success/30 px-2.5 py-0.5 rounded-full">
-                      <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                    <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-success bg-success/15 border border-success/30 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                       RESERVA ACTIVA
                     </span>
                   </div>
 
                   {/* Hero Graphic Image Frame */}
-                  <div className="relative aspect-[16/9] w-full border-b border-border/80 overflow-hidden">
+                  <div className="relative h-36 sm:h-40 w-full border-b border-border/80 overflow-hidden">
                     <Image
                       src="/fuel_station_hero.png"
                       alt="Surtidor de Combustible Dally SRL"
@@ -318,18 +318,18 @@ export default function LandingPage() {
                       className="object-cover object-center transition-transform duration-700 hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent" />
-                    <div className="absolute top-3 right-3 bg-background/80 backdrop-blur border border-border rounded-lg px-2.5 py-1 text-[10px] font-mono text-accent">
+                    <div className="absolute top-2.5 right-2.5 bg-background/80 backdrop-blur border border-border rounded-lg px-2 py-0.5 text-[9px] font-mono text-accent">
                       IMPORTACIÓN DIRECTA
                     </div>
                   </div>
 
                   {/* Realistic Fuel Dispensers Grid (Bolivia Style) */}
-                  <div className="p-4 space-y-3 bg-surface/60">
-                    <div className="grid grid-cols-2 gap-2.5">
+                  <div className="p-3 space-y-2 bg-surface/60">
+                    <div className="grid grid-cols-2 gap-2">
                       {currentSucursal.bombas.map((bomba) => (
                         <div
                           key={bomba.id}
-                          className={`bg-surface-alt/90 border rounded-xl p-3 transition-colors ${
+                          className={`bg-surface-alt/90 border rounded-xl p-2.5 transition-colors ${
                             bomba.color === 'accent'
                               ? 'border-accent/30 hover:border-accent'
                               : bomba.color === 'info'
@@ -339,18 +339,18 @@ export default function LandingPage() {
                               : 'border-warning/30 hover:border-warning'
                           }`}
                         >
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className={`text-[11px] font-bold font-mono text-${bomba.color}`}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-[10px] font-bold font-mono text-${bomba.color}`}>
                               BOMBA #{bomba.id}
                             </span>
                             <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded bg-${bomba.color}/20 text-${bomba.color}`}>
                               {bomba.precio}
                             </span>
                           </div>
-                          <p className="text-xs font-bold text-text-primary mb-1 truncate">{bomba.tipo}</p>
-                          <div className="bg-background/90 rounded border border-border p-1.5 font-mono text-center">
-                            <span className="text-[10px] text-text-muted block">TANQUE ESTRATÉGICO</span>
-                            <span className="text-xs font-bold text-text-primary">{bomba.nivel}</span>
+                          <p className="text-[11px] font-bold text-text-primary mb-1 truncate">{bomba.tipo}</p>
+                          <div className="bg-background/90 rounded border border-border p-1 font-mono text-center">
+                            <span className="text-[9px] text-text-muted block">TANQUE ESTRATÉGICO</span>
+                            <span className="text-[11px] font-bold text-text-primary">{bomba.nivel}</span>
                           </div>
                         </div>
                       ))}
@@ -358,9 +358,9 @@ export default function LandingPage() {
                   </div>
 
                   {/* Terminal Footer */}
-                  <div className="px-4 py-2.5 bg-surface border-t border-border flex items-center justify-between">
-                    <span className="text-[10px] text-text-muted font-mono">DISTRIBUCIÓN CONTINUA GARANTIZADA</span>
-                    <span className="text-[10px] text-accent font-mono font-semibold">SUPABASE REALTIME</span>
+                  <div className="px-3.5 py-2 bg-surface border-t border-border flex items-center justify-between">
+                    <span className="text-[9px] text-text-muted font-mono">DISTRIBUCIÓN CONTINUA GARANTIZADA</span>
+                    <span className="text-[9px] text-accent font-mono font-semibold">SUPABASE REALTIME</span>
                   </div>
                 </div>
               </div>
