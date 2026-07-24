@@ -1,111 +1,205 @@
-# ⛽ Sistema de Gestión de Combustible - Dally SRL
+<div align="center">
 
-Este es un sistema fullstack moderno desarrollado con **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS v4** y **Supabase** (PostgreSQL + Auth), diseñado para la gestión y monitoreo en tiempo real de estaciones de servicio.
+# ⛽ Dally SRL — Sistema de Gestión de Combustible
 
-## 🚀 Guía Rápida de Uso
+### Panel operativo en tiempo real para estaciones de servicio
 
-### 1. Requisitos Previos
-- Node.js 18+ y npm
-- Una cuenta y proyecto en [Supabase](https://supabase.com)
+[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-testprojectsurtidor.vercel.app-F5C518?style=for-the-badge&logo=vercel&logoColor=black)](https://testprojectsurtidor.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js%2016-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS%20v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-### 2. Configuración
-1. Clona el repositorio e instala las dependencias:
-   ```bash
-   cd surtidor-dally
-   npm install
-   ```
-2. Configura las variables de entorno. Crea un archivo `.env` basado en `.env.example`:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=tu_anon_key_de_supabase
-   ```
-3. Ejecuta los scripts SQL ubicados en la carpeta `prisma/` en el SQL Editor de tu proyecto de Supabase:
-   - Primero ejecuta `prisma/schema.sql` para crear las tablas.
-   - Luego ejecuta `prisma/seed.sql` para cargar los datos de prueba.
+</div>
 
-### 3. Ejecución
-Para iniciar el servidor de desarrollo:
-```bash
-npm run dev
+---
+
+## 🌐 Demo en Vivo
+
+**→ [https://testprojectsurtidor.vercel.app](https://testprojectsurtidor.vercel.app)**
+
+Accede al dashboard operativo directamente desde el navegador sin configuración local.
+
+### 🔑 Credenciales de Acceso (Demo)
+
+| Campo | Valor |
+|-------|-------|
+| **Usuario** | `davidwcz05@gmail.com` |
+| **Contraseña** | `1234lol` |
+
+> Estas credenciales son de demostración con acceso completo como **Superadmin**.
+
+---
+
+## 📋 Descripción del Proyecto
+
+**Dally SRL** es un sistema fullstack de gestión operativa para estaciones de servicio de combustible. Permite a los administradores monitorear ventas en tiempo real, registrar despachos, analizar métricas por tipo de combustible y gestionar alertas de nivel crítico, todo desde un único panel web.
+
+El proyecto fue desarrollado con enfoque académico y profesional, aplicando **patrones de diseño clásicos GoF** (Factory, Adapter, Observer), **aritmética binaria** para la codificación de metadata de ventas, y una arquitectura limpia orientada a componentes serverless.
+
+---
+
+## 🖥️ Capturas de Pantalla
+
+| Landing Page | Dashboard Operativo | Nueva Venta |
+|:---:|:---:|:---:|
+| Presentación institucional de la empresa con métricas y servicios | Panel KPIs en tiempo real, gráficos de área y dona, tabla de transacciones | Formulario de despacho con selector de surtidores, precios y flags binarios |
+
+---
+
+## ✨ Funcionalidades
+
+| Módulo | Descripción |
+|--------|-------------|
+| 🏠 **Landing Page** | Página corporativa con métricas, servicios y CTA al dashboard |
+| 📊 **Dashboard KPIs** | Ventas del día, litros despachados, transacciones y alertas en tiempo real |
+| 📈 **Gráficos** | Gráfico de área semanal (Gasolina vs Diésel) + dona de mix de combustibles |
+| ⛽ **Nueva Venta** | Registro de despachos como admin con selector visual de surtidores y nivel de tanque |
+| 🔔 **Notificaciones** | Panel desplegable con historial de ventas del día (tipo, monto, litros, hora) |
+| 👤 **Perfil** | Vista de cuenta del administrador en modo solo lectura |
+| 📋 **Reportes** | Decodificación visual del campo `metadata_binaria` (flags de bits por venta) |
+| 👥 **Operadores** | Tabla de operadores activos con conteo de ventas del turno |
+| 🔴 **Alertas** | Sistema automático de nivel crítico vía Observer pattern |
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### Frontend
+| Tecnología | Uso |
+|-----------|-----|
+| **Next.js 16** (App Router) | Framework fullstack con SSR y Server Components |
+| **TypeScript** | Tipado estático estricto en todo el proyecto |
+| **Tailwind CSS v4** | Sistema de diseño con tokens personalizados (colores, tipografía, animaciones) |
+| **Recharts** | Gráficos de área y dona responsive |
+| **Lucide React** | Librería de iconos modernos |
+
+### Backend & Base de Datos
+| Tecnología | Uso |
+|-----------|-----|
+| **Supabase** (PostgreSQL) | Base de datos relacional en la nube con cliente JS |
+| **Next.js API Routes** | Endpoints serverless para CRUD de ventas, surtidores y alertas |
+| **Supabase Auth** *(conceptual)* | Integración de autenticación con `auth.users` |
+
+### Infraestructura
+| Tecnología | Uso |
+|-----------|-----|
+| **Vercel** | Deploy automático desde Git, CDN global |
+| **Turbopack** | Compilador ultrarrápido de Next.js |
+
+---
+
+## 🧩 Patrones de Diseño (GoF)
+
+### 🏭 1. Factory Pattern — `PumpFactory`
+> `src/core/factories/PumpFactory.ts`
+
+Centraliza la creación y validación de surtidores por tipo de combustible. Cada bomba (`GasolinaEspecialPump`, `DieselPump`, `GNVPump`, `PremiumPump`) hereda de una clase base con capacidades máximas y umbrales de seguridad predefinidos. El API de surtidores nunca crea una bomba sin pasar primero por la Factory.
+
+### 🔌 2. Adapter Pattern — `DatabaseAdapter`
+> `src/core/adapters/DatabaseAdapter.ts`
+
+Define la interfaz `IDatabaseAdapter` que abstrae completamente la capa de persistencia. El `SupabaseDatabaseAdapter` implementa esa interfaz contra la API de Supabase. Si en el futuro se cambia de proveedor, solo se reemplaza el adaptador sin tocar la lógica de negocio.
+
+### 👁️ 3. Observer Pattern — `AlertObserver`
+> `src/core/observers/AlertObserver.ts`
+
+`PumpMonitor` actúa como sujeto que observa los niveles de combustible tras cada venta. Cuando el nivel cae por debajo del umbral seguro (definido en la Factory), notifica a los observadores registrados, que generan alertas automáticas en la base de datos.
+
+---
+
+## ⚙️ Aritmética Binaria — `metadata_binaria`
+
+Cada venta almacena sus características en **un solo campo entero** usando operaciones de bits, optimizando el almacenamiento y habilitando filtros de alta velocidad.
+
 ```
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+metadata_binaria = 0b 0000 FFSS PPII
+                          │ │  │  └── Bit 0 (0x01): Facturada
+                          │ │  └───── Bit 1 (0x02): Pago Digital
+                          │ └──────── Bit 2 (0x04): Subsidio Estatal
+                          └────────── Bit 3 (0x08): Cliente Flota
+```
 
-### 4. Navegación
-- **Landing Page (`/`)**: Información general de la empresa, métricas estáticas y servicios.
-- **Login (`/login`)**: Autenticación integrada con Supabase Auth. Puedes probar registrando un usuario en Supabase o configurando credenciales de prueba (ej: `admin@dallysrl.bo`).
-- **Dashboard (`/dashboard`)**: Panel principal operativo (requiere autenticación o mock temporal). Muestra KPIs en tiempo real, gráficos de ventas (área y dona), decodificación binaria de metadata y estado de operadores.
+| Operación | Código | Descripción |
+|-----------|--------|-------------|
+| Codificar | `flags \| 0x01` | Activar bit de "Facturada" |
+| Verificar | `flags & 0x02` | Comprobar si fue "Pago Digital" |
+| Decodificar | `.toString(2).padStart(4, '0')` | Representación binaria visual |
+
+La pestaña **"REPORTES"** del dashboard incluye un decodificador visual en tiempo real de todas las transacciones del día.
 
 ---
 
-## 🏗️ Estructura del Proyecto
+## 🎨 Diseño y Estética
 
-El proyecto sigue una arquitectura limpia orientada a componentes y Serverless APIs:
+El sistema aplica un estilo **dark mode industrial** inspirado en interfaces de control operativo:
 
-```text
-surtidor-dally/
-├── src/
-│   ├── app/                    # Next.js App Router (Páginas y APIs)
-│   │   ├── (auth)/login/       # Página de Login
-│   │   ├── api/                # Endpoints Serverless (alertas, dashboard, surtidores, ventas)
-│   │   ├── dashboard/          # Panel principal operativo
-│   │   ├── globals.css         # Configuración y tokens de Tailwind CSS v4
-│   │   ├── layout.tsx          # Root Layout (Fuentes, Metadata, Tema)
-│   │   └── page.tsx            # Landing Page
-│   ├── components/             # Componentes React reutilizables (UI y Dashboard)
-│   ├── core/                   # Lógica de negocio core y Patrones de Diseño
-│   │   ├── adapters/           # Patrón Adapter (Conexión a BD)
-│   │   ├── factories/          # Patrón Factory (Creación de Surtidores)
-│   │   ├── observers/          # Patrón Observer (Sistema de Alertas)
-│   │   └── utils/              # Utilidades (Aritmética Binaria)
-│   ├── lib/                    # Configuración de librerías externas (Supabase Client)
-│   └── types/                  # Definiciones de TypeScript e Interfaces globales
-├── prisma/                     # Scripts SQL para Supabase (schema y seed)
-├── public/                     # Assets estáticos e iconos
-└── tailwind.config.ts / css    # Configuración de estilos y colores
+| Token | Valor | Uso |
+|-------|-------|-----|
+| `--color-background` | `#0D0D0D` | Fondo principal (negro profundo) |
+| `--color-surface` | `#1A1A1A` | Superficies y tarjetas |
+| `--color-accent` | `#F5C518` | Amarillo señalización — CTA y métricas |
+| `--color-success` | `#22C55E` | Estados positivos y niveles altos |
+| `--color-danger` | `#EF4444` | Alertas y errores |
+| `--color-info` | `#3B82F6` | Diésel y elementos informativos |
+
+**Tipografía:** [Inter](https://fonts.google.com/specimen/Inter) — moderna y de alta legibilidad técnica.
+
+**Animaciones:** `fadeIn`, `fadeInUp`, `slideInRight`, `pulse-glow`, `float` — micro-animaciones CSS nativas para una experiencia premium.
+
+**Glassmorphism:** Aplicado en overlays y dropdowns del header con `backdrop-filter: blur`.
+
+---
+
+## 🗄️ Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── (auth)/login/        # Autenticación
+│   ├── api/                 # Endpoints serverless
+│   │   ├── alertas/         # CRUD alertas
+│   │   ├── dashboard/       # Datos centralizados del panel
+│   │   ├── surtidores/      # CRUD bombas
+│   │   └── ventas/          # Registro de transacciones
+│   ├── dashboard/           # Panel principal (4 pestañas)
+│   ├── globals.css          # Tokens de diseño y animaciones
+│   └── page.tsx             # Landing Page corporativa
+├── components/dashboard/    # KPICard, SalesChart, FuelMixChart, TransactionsTable
+├── core/
+│   ├── adapters/            # Patrón Adapter (DatabaseAdapter)
+│   ├── factories/           # Patrón Factory (PumpFactory)
+│   ├── observers/           # Patrón Observer (AlertObserver)
+│   └── utils/               # Aritmética binaria (binaryMetadata)
+├── lib/
+│   └── supabase.ts          # Cliente Supabase
+├── types/
+│   └── index.ts             # Interfaces y enums globales
+└── prisma/
+    ├── schema.sql           # Definición de tablas en Supabase
+    └── seed.sql             # Datos de demostración
 ```
 
 ---
 
-## 🧩 Patrones de Diseño Implementados
+## 🗃️ Base de Datos
 
-Este sistema hace uso extensivo de patrones de diseño clásicos (GoF) para garantizar escalabilidad y mantenimiento:
+El esquema está definido en `prisma/schema.sql` para ejecutar en el SQL Editor de Supabase.
 
-### 1. Factory Pattern (Creacional)
-Ubicado en `src/core/factories/PumpFactory.ts`. Centraliza la lógica de creación y validación de los distintos tipos de surtidores (`GasolinaEspecialPump`, `DieselPump`, etc.). Asegura que las capacidades máximas y reglas de negocio específicas de cada combustible se respeten antes de interactuar con la base de datos.
+```
+sucursales ──< surtidores ──< ventas
+           └─< usuarios   ──< ventas
+               surtidores ──< alertas
+```
 
-### 2. Adapter Pattern (Estructural)
-Ubicado en `src/core/adapters/DatabaseAdapter.ts`. Define una interfaz común (`IDatabaseAdapter`) que aísla toda la lógica de negocio de la implementación específica de Supabase. Esto permite que el sistema pueda cambiar de proveedor de base de datos en el futuro sin modificar los controladores o la UI. Actualmente implementa el `SupabaseDatabaseAdapter` para consultas SQL reales.
-
-### 3. Observer Pattern (Comportamiento)
-Ubicado en `src/core/observers/AlertObserver.ts`. Implementa un sistema reactivo donde un sujeto (`PumpMonitor`) vigila los niveles de combustible de los surtidores. Cuando un nivel cae por debajo de los umbrales seguros definidos en el Factory, notifica automáticamente a los observadores registrados (ej: `DashboardObserver`) para despachar alertas.
-
----
-
-## ⚙️ Aritmética Binaria (Metadata de Ventas)
-
-Para optimizar el almacenamiento y permitir filtros avanzados rápidos, características específicas de cada venta se almacenan usando **lógica de bits** en un solo campo numérico (`metadata_binaria`).
-
-Ubicado en `src/core/utils/binaryMetadata.ts`.
-
-| Bit | Máscara | Propiedad | Descripción |
-| :---: | :---: | :--- | :--- |
-| **0** | `0x01` | `Facturada` | Indica si la venta generó factura fiscal. |
-| **1** | `0x02` | `Pago Digital` | Indica si el pago fue por QR, Tarjeta, etc. |
-| **2** | `0x04` | `Subsidio Estatal`| Aplica para ciertos combustibles regulados. |
-| **3** | `0x08` | `Cliente Flota` | Indica si la venta pertenece a una cuenta corporativa. |
-
-**Operaciones utilizadas:**
-- `OR` (`|`) y Desplazamiento (`<<`) para codificar.
-- `AND` (`&`) para verificar la existencia de un flag.
-- El Dashboard (Pestaña "Reportes") incluye un decodificador visual en tiempo real de estas transacciones.
+**Tablas:** `sucursales` · `usuarios` · `surtidores` · `ventas` · `alertas`
 
 ---
 
-## 🎨 Diseño y UI (Tailwind v4)
+<div align="center">
 
-La interfaz fue construida siguiendo un diseño en Figma para un look moderno e industrial (Dark Mode nativo).
-- **Fondo Primario:** `#0D0D0D` (Negro profundo)
-- **Acento Primario:** `#F5C518` (Amarillo señalización)
-- **Acentos Secundarios:** Cian y Naranja para gráficos y estados.
-- Se utiliza la fuente **Inter** para garantizar legibilidad técnica.
-- Gráficos renderizados con **Recharts**.
+Desarrollado con ❤️ por el equipo **Dally SRL**
+
+[![Deploy con Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://testprojectsurtidor.vercel.app)
+
+</div>
