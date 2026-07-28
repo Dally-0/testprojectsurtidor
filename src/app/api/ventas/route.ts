@@ -2,7 +2,7 @@
 // API Route: Ventas — GET / POST
 // ============================================================
 // Incluye decodificación de metadata binaria (aritmética de bits)
-// en las respuestas GET para filtros avanzados de reportes.
+// y validaciones estrictas de backend según OWASP.
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -22,16 +22,23 @@ export async function GET(request: NextRequest) {
     const adapter = getAdapter();
     const { searchParams } = new URL(request.url);
 
-    const filters = {
-      surtidorId: searchParams.get('surtidor_id') || undefined,
-      combustible: searchParams.get('combustible') || undefined,
-      fechaDesde: searchParams.get('fecha_desde') || undefined,
-      fechaHasta: searchParams.get('fecha_hasta') || undefined,
-    };
+    const surtidorId = searchParams.get('surtidor_id') || undefined;
+    const combustible = searchParams.get('combustible') || undefined;
+    const fechaDesde = searchParams.get('fecha_desde') || undefined;
+    const fechaHasta = searchParams.get('fecha_hasta') || undefined;
 
-    const ventas = await adapter.getVentas(filters);
+    // Sanitización básica de parámetros
+    if (surtidorId && !/^[a-zA-Z0-9-]+$/.test(surtidorId)) {
+      return NextResponse.json({ success: false, error: 'Parámetro surtidor_id inválido' }, { status: 400 });
+    }
 
-    // Decodificar metadata binaria de cada venta
+    const ventas = await adapter.getVentas({
+      surtidorId,
+      combustible,
+      fechaDesde,
+      fechaHasta,
+    });
+
     const ventasConMetadata = ventas.map(venta => ({
       ...venta,
       metadata_decoded: decodeFlags(venta.metadata_binaria),
@@ -52,13 +59,19 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/ventas
- * Registra una nueva venta. Codifica los flags de metadata
- * y evalúa niveles de surtidor vía Observer pattern.
+ * Registra una nueva venta con validación estricta de esquema y seguridad.
  */
 export async function POST(request: NextRequest) {
   try {
     const adapter = getAdapter();
     const body = await request.json();
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json(
+        { success: false, error: 'El cuerpo de la petición debe ser un objeto JSON válido' },
+        { status: 400 }
+      );
+    }
 
     const {
       combustible,
@@ -72,38 +85,82 @@ export async function POST(request: NextRequest) {
       clienteFlota = false,
     } = body;
 
-    // Codificar flags de metadata con aritmética binaria
+    const validationErrors: string[] = [];
+
+    // Validaciones de esquema y tipo
+    if (!combustible || typeof combustible !== 'string' || !combustible.trim()) {
+      validationErrors.push('El campo combustible es obligatorio.');
+    }
+
+    const litrosNum = Number(litros);
+    if (isNaN(litrosNum) || litrosNum <= 0 || litrosNum > 5000) {
+      validationErrors.push('El número de litros debe ser mayor a 0 y no exceder 5,000 L.');
+    }
+
+    const precioNum = Number(precio_por_litro);
+    if (isNaN(precioNum) || precioNum <= 0 || precioNum > 100) {
+      validationErrors.push('El precio por litro debe ser un valor positivo entre 0.01 y 100 Bs.');
+    }
+
+    if (!surtidor_id || typeof surtidor_id !== 'string' || !/^[a-zA-Z0-9-]+$/.test(surtidor_id)) {
+      validationErrors.push('El identificador surtidor_id no es válido.');
+    }
+
+    if (!usuario_id || typeof usuario_id !== 'string' || !/^[a-zA-Z0-9-]+$/.test(usuario_id)) {
+      validationErrors.push('El identificador usuario_id no es válido.');
+    }
+
+    if (validationErrors.length > 0) {
+      return NextResponse.json(
+        { success: false, errors: validationErrors, error: validationErrors.join(' ') },
+        { status: 400 }
+      );
+    }
+
+    // Verificar nivel disponible del surtidor
+    const surtidor = await adapter.getSurtidorById(surtidor_id);
+    if (!surtidor) {
+      return NextResponse.json(
+        { success: false, error: 'El surtidor especificado no existe.' },
+        { status: 404 }
+      );
+    }
+
+    if (litrosNum > surtidor.nivel_actual) {
+      return NextResponse.json(
+        { success: false, error: `Los litros solicitados (${litrosNum} L) superan el nivel actual del surtidor (${surtidor.nivel_actual} L).` },
+        { status: 400 }
+      );
+    }
+
+    // Codificar flags de metadata binaria
     const metadata_binaria = encodeFlags({
-      facturada,
-      pagoDigital,
-      subsidioAplicado,
-      clienteFlota,
+      facturada: Boolean(facturada),
+      pagoDigital: Boolean(pagoDigital),
+      subsidioAplicado: Boolean(subsidioAplicado),
+      clienteFlota: Boolean(clienteFlota),
     });
 
-    const total = litros * precio_por_litro;
+    const total = litrosNum * precioNum;
 
     const venta = await adapter.createVenta({
-      combustible,
-      litros,
-      precio_por_litro,
+      combustible: combustible.trim(),
+      litros: litrosNum,
+      precio_por_litro: precioNum,
       total,
       surtidor_id,
       usuario_id,
       metadata_binaria,
     });
 
-    // Actualizar nivel del surtidor y verificar con Observer
-    const surtidor = await adapter.getSurtidorById(surtidor_id);
-    if (surtidor) {
-      const nuevoNivel = surtidor.nivel_actual - litros;
-      await adapter.updateSurtidor(surtidor_id, { nivel_actual: Math.max(0, nuevoNivel) });
+    // Actualizar nivel del surtidor y notificar al Observer
+    const nuevoNivel = Math.max(0, surtidor.nivel_actual - litrosNum);
+    await adapter.updateSurtidor(surtidor_id, { nivel_actual: nuevoNivel });
 
-      // Notificar al PumpMonitor (Observer pattern)
-      const monitor = PumpMonitor.getInstance();
-      const updatedSurtidor = { ...surtidor, nivel_actual: Math.max(0, nuevoNivel) };
-      const threshold = PumpFactory.getSafetyThresholds()[surtidor.combustible as FuelType] || 500;
-      monitor.checkPumpStatus(updatedSurtidor, threshold);
-    }
+    const monitor = PumpMonitor.getInstance();
+    const updatedSurtidor = { ...surtidor, nivel_actual: nuevoNivel };
+    const threshold = PumpFactory.getSafetyThresholds()[surtidor.combustible as FuelType] || 500;
+    monitor.checkPumpStatus(updatedSurtidor, threshold);
 
     return NextResponse.json({
       success: true,

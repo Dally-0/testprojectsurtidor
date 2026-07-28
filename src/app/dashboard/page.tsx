@@ -12,6 +12,7 @@ import KPICard from '@/components/dashboard/KPICard';
 import SalesChart from '@/components/dashboard/SalesChart';
 import FuelMixChart from '@/components/dashboard/FuelMixChart';
 import TransactionsTable from '@/components/dashboard/TransactionsTable';
+import ShepherdTour from '@/components/dashboard/ShepherdTour';
 
 type TabKey = 'ventas' | 'nueva-venta' | 'reportes' | 'operadores';
 
@@ -95,7 +96,7 @@ const ADMIN_PROFILE = {
 };
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('ventas');
+  const [activeTab, setActiveTab] = useState<TabKey>('nueva-venta');
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -188,6 +189,9 @@ export default function DashboardPage() {
                 <span className="text-xs text-text-muted">{error ? 'Error' : 'En línea'}</span>
                 <span className="text-xs text-text-muted ml-2">· {today}</span>
               </div>
+
+              {/* Tour guiado */}
+              <ShepherdTour />
 
               {/* Refresh */}
               <button
@@ -576,6 +580,8 @@ function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVenta
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [litrosError, setLitrosError] = useState<string | null>(null);
+  const [precioError, setPrecioError] = useState<string | null>(null);
 
   const filteredSurtidores = selectedSucursalId
     ? surtidores.filter((s) => s.sucursal_id === selectedSucursalId)
@@ -583,25 +589,62 @@ function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVenta
 
   const totalCalculado = parseFloat(litros || '0') * parseFloat(precioPorLitro || '0');
   const litrosNum = parseFloat(litros || '0');
+  const precioNum = parseFloat(precioPorLitro || '0');
   const nivelDisponible = selectedSurtidor?.nivel_actual ?? 0;
   const litrosInsuficientes = litrosNum > nivelDisponible && litrosNum > 0;
+
+  const validateForm = (): boolean => {
+    let isValid = true;
+    setLitrosError(null);
+    setPrecioError(null);
+    setErrorMsg(null);
+
+    if (!selectedSucursalId) {
+      setErrorMsg('Debe seleccionar una sucursal/estación antes de continuar.');
+      return false;
+    }
+
+    if (!selectedSurtidor) {
+      setErrorMsg('Debe seleccionar una bomba/surtidor de la lista.');
+      return false;
+    }
+
+    if (!litros || isNaN(litrosNum) || litrosNum <= 0) {
+      setLitrosError('Ingrese una cantidad válida de litros (mayor a 0).');
+      isValid = false;
+    } else if (litrosNum > 5000) {
+      setLitrosError('La cantidad máxima permitida por despacho es de 5,000 litros.');
+      isValid = false;
+    } else if (litrosInsuficientes) {
+      setLitrosError(`Los litros solicitados (${litrosNum} L) superan el nivel disponible (${nivelDisponible} L).`);
+      isValid = false;
+    }
+
+    if (!precioPorLitro || isNaN(precioNum) || precioNum <= 0) {
+      setPrecioError('Ingrese un precio por litro válido (mayor a Bs. 0).');
+      isValid = false;
+    } else if (precioNum > 100) {
+      setPrecioError('El precio por litro excede el límite razonable (Bs. 100).');
+      isValid = false;
+    }
+
+    return isValid;
+  };
 
   const handleSelectSurtidor = (s: SurtidorInfo) => {
     setSelectedSurtidor(s);
     const precio = PRECIOS_DEFAULT[s.combustible] ?? 5.0;
     setPrecioPorLitro(precio.toFixed(2));
     setLitros('');
+    setLitrosError(null);
+    setPrecioError(null);
     setSuccessMsg(null);
     setErrorMsg(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSurtidor) return;
-    if (litrosInsuficientes) {
-      setErrorMsg('Los litros solicitados superan el nivel actual del surtidor.');
-      return;
-    }
+    if (!validateForm() || !selectedSurtidor) return;
 
     setSubmitting(true);
     setSuccessMsg(null);
@@ -614,7 +657,7 @@ function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVenta
         body: JSON.stringify({
           combustible: selectedSurtidor.combustible,
           litros: litrosNum,
-          precio_por_litro: parseFloat(precioPorLitro),
+          precio_por_litro: precioNum,
           surtidor_id: selectedSurtidor.id,
           usuario_id: ADMIN_USER_ID,
           facturada,
@@ -630,6 +673,8 @@ function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVenta
           `✓ Venta registrada — ${litrosNum.toFixed(2)} L de ${selectedSurtidor.combustible} · Bs. ${totalCalculado.toFixed(2)}`
         );
         setLitros('');
+        setLitrosError(null);
+        setPrecioError(null);
         setFacturada(false);
         setPagoDigital(false);
         setSubsidioAplicado(false);
@@ -860,17 +905,21 @@ function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVenta
                   max={selectedSurtidor?.nivel_actual ?? 99999}
                   step="0.01"
                   value={litros}
-                  onChange={(e) => setLitros(e.target.value)}
+                  onChange={(e) => {
+                    setLitros(e.target.value);
+                    if (litrosError) setLitrosError(null);
+                  }}
                   placeholder="0.00"
                   required
                   disabled={!selectedSurtidor}
-                  className={`w-full bg-surface border rounded-xl px-4 py-3 text-text-primary text-sm font-mono placeholder:text-text-muted focus:outline-none focus:border-accent transition-colors disabled:opacity-40 ${
-                    litrosInsuficientes ? 'border-danger focus:border-danger' : 'border-border'
+                  className={`w-full bg-surface border rounded-xl px-4 py-3 text-text-primary text-sm font-mono placeholder:text-text-muted focus:outline-none transition-colors disabled:opacity-40 ${
+                    litrosError || litrosInsuficientes ? 'border-danger focus:border-danger' : 'border-border focus:border-accent'
                   }`}
                 />
-                {litrosInsuficientes && (
+                {(litrosError || litrosInsuficientes) && (
                   <p className="text-xs text-danger flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" /> Supera el nivel actual del surtidor
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                    {litrosError || 'Supera el nivel actual del surtidor'}
                   </p>
                 )}
               </div>
@@ -885,12 +934,23 @@ function NuevaVentaTab({ surtidores, sucursales, onVentaRegistrada }: NuevaVenta
                   min="0.01"
                   step="0.01"
                   value={precioPorLitro}
-                  onChange={(e) => setPrecioPorLitro(e.target.value)}
+                  onChange={(e) => {
+                    setPrecioPorLitro(e.target.value);
+                    if (precioError) setPrecioError(null);
+                  }}
                   placeholder="0.00"
                   required
                   disabled={!selectedSurtidor}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text-primary text-sm font-mono placeholder:text-text-muted focus:outline-none focus:border-accent transition-colors disabled:opacity-40"
+                  className={`w-full bg-surface border rounded-xl px-4 py-3 text-text-primary text-sm font-mono placeholder:text-text-muted focus:outline-none transition-colors disabled:opacity-40 ${
+                    precioError ? 'border-danger focus:border-danger' : 'border-border focus:border-accent'
+                  }`}
                 />
+                {precioError && (
+                  <p className="text-xs text-danger flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                    {precioError}
+                  </p>
+                )}
               </div>
             </div>
 

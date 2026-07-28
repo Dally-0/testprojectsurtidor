@@ -68,7 +68,7 @@ export default function Navbar() {
             <Link
               href="/login"
               id="nav-login-btn"
-              className="bg-accent hover:bg-accent-hover text-background font-semibold text-sm tracking-figma px-6 py-2.5 rounded transition-all hover:shadow-lg hover:shadow-accent/20"
+              className="bg-accent hover:bg-accent-hover text-background font-semibold text-xs tracking-figma px-6 py-2.5 rounded-lg transition-all hover:shadow-lg hover:shadow-accent/20"
             >
               INICIAR SESIÓN
             </Link>
@@ -103,7 +103,7 @@ export default function Navbar() {
               </a>
               <Link
                 href="/login"
-                className="bg-accent hover:bg-accent-hover text-background font-semibold text-sm tracking-figma px-6 py-2.5 rounded text-center mt-2"
+                className="bg-accent hover:bg-accent-hover text-background font-semibold text-xs tracking-figma px-6 py-2.5 rounded-lg text-center"
                 onClick={() => setMenuOpen(false)}
               >
                 INICIAR SESIÓN
